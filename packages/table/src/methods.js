@@ -1851,7 +1851,7 @@ const Methods = {
         return
       }
       if (!isReset) {
-        XEUtils.eachTree(collectColumn, column => {
+        XEUtils.arrayEach(collectColumn, column => {
           const colKey = column.getKey()
           if (colKey) {
             cols.push(colKey + '|' + column.colSeq)
