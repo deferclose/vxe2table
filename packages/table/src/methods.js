@@ -557,17 +557,22 @@ const Methods = {
     const collectColumn = XEUtils.mapTree(columns, column => Cell.createColumn(this, column), { children: 'children' })
     return this.handleColumn(collectColumn)
   },
-  /**
-   * 加载列配置并恢复到初始状态
-   * 对于表格列需要重载、局部递增场景下可能会用到
-   * @param {ColumnInfo} columns 列配置
-   */
-  reloadColumn (columns) {
-    return this.clearAll().then(() => {
-      return this.loadColumn(columns)
+  resetOrder () {
+    const { collectColumn } = this
+    XEUtils.eachTree(collectColumn, (column) => {
+      column.colSeq = column.order
     })
+
+    this.saveCustomOrder(true)
+
+    return this.loadColumn2(collectColumn)
   },
-  handleColumn (collectColumn) {
+  loadColumn2 (columns) {
+    const collectColumn = XEUtils.mapTree(columns, column => Cell.createColumn(this, column), { children: 'children' })
+    return this.handleColumn2(collectColumn)
+  },
+  handleColumn2 (collectColumn) {
+    collectColumn = this.sortCollectColumn(collectColumn, false)
     this.collectColumn = collectColumn
     const tableFullColumn = getColumnList(collectColumn)
     this.tableFullColumn = tableFullColumn
@@ -592,6 +597,76 @@ const Methods = {
       }
       return this.recalculate()
     })
+  },
+  /**
+   * 加载列配置并恢复到初始状态
+   * 对于表格列需要重载、局部递增场景下可能会用到
+   * @param {ColumnInfo} columns 列配置
+   */
+  reloadColumn (columns) {
+    return this.clearAll().then(() => {
+      return this.loadColumn(columns)
+    })
+  },
+  handleColumn (collectColumn) {
+    collectColumn = this.sortCollectColumn(collectColumn, true)
+    this.collectColumn = collectColumn
+    const tableFullColumn = getColumnList(collectColumn)
+    this.tableFullColumn = tableFullColumn
+    this.cacheColumnMap()
+    this.restoreCustomStorage()
+    this.parseColumns().then(() => {
+      if (this.scrollXLoad) {
+        this.loadScrollXData(true)
+      }
+    })
+    this.clearMergeCells()
+    this.clearMergeFooterItems()
+    this.handleTableData(true)
+    if (process.env.VUE_APP_VXE_TABLE_ENV === 'development') {
+      if ((this.scrollXLoad || this.scrollYLoad) && this.expandColumn) {
+        warnLog('vxe.error.scrollErrProp', ['column.type=expand'])
+      }
+    }
+    return this.$nextTick().then(() => {
+      if (this.$toolbar) {
+        this.$toolbar.syncUpdate({ collectColumn, $table: this })
+      }
+      return this.recalculate()
+    })
+  },
+  sortCollectColumn (collectColumn, isFirst) {
+    if (isFirst) {
+      const customMap = {}
+      const { id, customOpts } = this
+      const { storage } = customOpts
+      const isCustomOrder = storage === true || (storage && storage.order)
+      if (isCustomOrder) {
+        const columnOrderStorage = getCustomStorageMap(orderStorageKey)[id]
+        if (columnOrderStorage) {
+          const colOrderSeqs = columnOrderStorage.split(',')
+          colOrderSeqs.forEach((orderConf) => {
+            const [colKey, order] = orderConf.split('|')
+            if (customMap[colKey]) {
+              customMap[colKey].order = order
+            } else {
+              customMap[colKey] = { order }
+            }
+          })
+        }
+      }
+
+      XEUtils.arrayEach(collectColumn, (column, idx) => {
+        column.order = idx
+        column.colSeq = idx
+        const colKey = column.getKey()
+        if (colKey && customMap[colKey]) {
+          const { order } = customMap[colKey]
+          column.colSeq = order
+        }
+      })
+    }
+    return XEUtils.orderBy(collectColumn, [['colSeq', 'asc']])
   },
   /**
    * 更新数据行的 Map
@@ -1586,8 +1661,8 @@ const Methods = {
     const isCustomResizable = isAllStorage || (storage && storage.resizable)
     const isCustomVisible = isAllStorage || (storage && storage.visible)
     const isCustomFixed = storage === true || (storage && storage.fixed)
-    const isCustomOrder = storage === true || (storage && storage.order)
-    if (customConfig && (isCustomResizable || isCustomVisible || isCustomFixed || isCustomOrder)) {
+    // const isCustomOrder = storage === true || (storage && storage.order)
+    if (customConfig && (isCustomResizable || isCustomVisible || isCustomFixed)) {
       const customMap = {}
       if (!id) {
         errLog('vxe.error.reqProp', ['id'])
@@ -1617,20 +1692,20 @@ const Methods = {
         }
       }
       // 自定义顺序
-      if (isCustomOrder) {
-        const columnOrderStorage = getCustomStorageMap(orderStorageKey)[id]
-        if (columnOrderStorage) {
-          // const colOrderSeqs = columnOrderStorage.split(',')
-          // colOrderSeqs.forEach((orderConf) => {
-          //   const [colKey, order] = orderConf.split('|')
-          //   if (customMap[colKey]) {
-          //     customMap[colKey].order = order
-          //   } else {
-          //     customMap[colKey] = { order }
-          //   }
-          // })
-        }
-      }
+      // if (isCustomOrder) {
+      //   const columnOrderStorage = getCustomStorageMap(orderStorageKey)[id]
+      //   if (columnOrderStorage) {
+      //     const colOrderSeqs = columnOrderStorage.split(',')
+      //     colOrderSeqs.forEach((orderConf) => {
+      //       const [colKey, order] = orderConf.split('|')
+      //       if (customMap[colKey]) {
+      //         customMap[colKey].order = order
+      //       } else {
+      //         customMap[colKey] = { order }
+      //       }
+      //     })
+      //   }
+      // }
       if (isCustomVisible) {
         const columnVisibleStorage = getCustomStorageMap(visibleStorageKey)[id]
         if (columnVisibleStorage) {
@@ -1673,8 +1748,9 @@ const Methods = {
             column.fixed = fixed
           }
           if (order) {
-            column.colSeq = order
+            column.customOrder = order
           }
+          console.log('set custom', { field: field, visible: visible, resizeWidth: resizeWidth, fixed: fixed, order: order })
         }
       })
     }
@@ -1760,6 +1836,30 @@ const Methods = {
       }
       columnWidthStorageMap[id] = XEUtils.isEmpty(columnWidthStorage) ? undefined : columnWidthStorage
       localStorage.setItem(resizableStorageKey, XEUtils.toJSONString(columnWidthStorageMap))
+    }
+  },
+  saveCustomOrder (isReset) {
+    const { id, collectColumn, customConfig, customOpts } = this
+    const { storage } = customOpts
+    const isAllStorage = customOpts.storage === true
+    const isCustomOrder = isAllStorage || (storage && storage.order)
+    if (customConfig && isCustomOrder) {
+      const columnOrderStorageMap = getCustomStorageMap(orderStorageKey)
+      const cols = []
+      if (!id) {
+        errLog('vxe.error.reqProp', ['id'])
+        return
+      }
+      if (!isReset) {
+        XEUtils.eachTree(collectColumn, column => {
+          const colKey = column.getKey()
+          if (colKey) {
+            cols.push(colKey + '|' + column.colSeq)
+          }
+        })
+      }
+      columnOrderStorageMap[id] = cols.join(',') || undefined
+      localStorage.setItem(orderStorageKey, XEUtils.toJSONString(columnOrderStorageMap))
     }
   },
   handleUpdateDataQueue () {

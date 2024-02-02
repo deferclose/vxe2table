@@ -108,19 +108,21 @@
     }
     .vxe-custom--body {
       padding: 0.2em 0;
-      max-height: 17.6em;
+      max-height: 24em;
       .vxe-custom--option {
         &:hover {
           background-color: $vxe-table-row-hover-background-color;
         }
       }
     }
-    .vxe-custom--header,
-    .vxe-custom--body {
+    .vxe-custom--body2 {
+      padding: 0;
+    }
+    .vxe-custom--body, .vxe-custom--body2 {
       & > li {
         max-width: 18em;
         min-width: 14em;
-        padding: 0.2em 1em 0.2em 1em;
+        padding: 0.2em 0;
         @for $i from 2 through 8 {
           $interval: $i - 1 + 0.2;
           &.level--#{$i}{
@@ -130,6 +132,13 @@
             }
           }
         }
+      }
+    }
+    .vxe-custom--header{
+      & > li {
+        max-width: 18em;
+        min-width: 14em;
+        padding: 0.2em 1em;
       }
     }
     .vxe-custom--footer {
@@ -169,6 +178,17 @@
   user-select: none;
 }
 
+.level--top {
+  flex-direction: column;
+}
+
+.level--top-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 1em;
+}
+
 .vxe-custom--checkbox-option {
   @extend %XECheckboxIcon;
   overflow: hidden;
@@ -197,6 +217,16 @@
       cursor: no-drop;
       color: $vxe-input-disabled-color;
     }
+  }
+}
+
+.vxe-custom--order-option {
+  line-height: 1.34em;
+  font-size: 1.1em;
+  padding: 0 0.2em;
+  cursor: pointer;
+  &:hover {
+    color: $vxe-primary-color;
   }
 }
 

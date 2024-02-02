@@ -206,6 +206,7 @@ export default {
     TOOLBAR_TOOLS_FIXED_LEFT_ACTIVED: iconPrefix + 'fixed-left-fill',
     TOOLBAR_TOOLS_FIXED_RIGHT: iconPrefix + 'fixed-right',
     TOOLBAR_TOOLS_FIXED_RIGHT_ACTIVED: iconPrefix + 'fixed-right-fill',
+    TOOLBAR_TOOLS_ORDER: iconPrefix + 'sort',
 
     // form
     FORM_PREFIX: iconPrefix + 'question-circle-fill',
@@ -316,6 +317,7 @@ export default {
     // },
     custom: {
       allowFixed: true,
+      allowOrder: true,
       showFooter: true
     }
     // buttons: []

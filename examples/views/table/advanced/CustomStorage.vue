@@ -19,11 +19,21 @@
       id="toolbar_demo3"
       :custom-config="{storage: true}"
       :data="tableData">
-      <vxe-column type="seq" width="60"></vxe-column>
-      <vxe-column field="name" title="Name"></vxe-column>
-      <vxe-column field="role" title="Role"></vxe-column>
-      <vxe-column field="sex" title="Sex"></vxe-column>
-      <vxe-column field="age" title="Age"></vxe-column>
+      <vxe-colgroup title="基本信息" field="group0">
+        <vxe-column type="seq" width="60"></vxe-column>
+        <vxe-column field="name" title="Name"></vxe-column>
+      </vxe-colgroup>
+      <vxe-colgroup title="更多信息" field="group1">
+        <vxe-column field="role" title="Role"></vxe-column>
+        <vxe-colgroup title="详细信息" field="group11">
+          <vxe-column field="sex" title="Sex"></vxe-column>
+          <vxe-column field="age" title="Age"></vxe-column>
+        </vxe-colgroup>
+      </vxe-colgroup>
+      <vxe-colgroup title="分类信息" field="group2">
+        <vxe-column field="date3" title="Date"></vxe-column>
+      </vxe-colgroup>
+      <vxe-column field="address" title="地址" show-overflow></vxe-column>
     </vxe-table>
 
     <p class="demo-code">{{ $t('app.body.button.showCode') }}</p>

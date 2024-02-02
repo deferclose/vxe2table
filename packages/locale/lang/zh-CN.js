@@ -267,7 +267,8 @@ export default {
       customRestore: '重置',
       fixedLeft: '固定在左侧',
       fixedRight: '固定在右侧',
-      cancelfixed: '取消固定'
+      cancelfixed: '取消固定',
+      order: '拖动排序'
     },
     input: {
       date: {

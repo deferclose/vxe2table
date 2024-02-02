@@ -3,7 +3,7 @@
     <header class="page-header">
       <div class="left">
         <a href="/vxe-table/">
-          <img src="/vxe-table/logo.png" width="18">
+          <!-- <img src="/vxe-table/logo.png" width="18"> -->
           <span class="title">官网文档地址：<a href="https://github.com/x-extends/vxe-table-docs">https://github.com/x-extends/vxe-table-docs</a></span>
         </a>
       </div>
@@ -2141,9 +2141,9 @@ export default {
       setTimeout(() => this.defaultExpand(), 1500)
     },
     loadSponsors () {
-      fetch('https://api.vxetable.cn/demo/api/pub/sponsors').then(response => response.json()).then(data => {
-        this.sponsorList = data
-      })
+      // fetch('https://api.vxetable.cn/demo/api/pub/sponsors').then(response => response.json()).then(data => {
+      //   this.sponsorList = data
+      // })
     },
     loadList () {
       this.tableData = XEUtils.clone(this.tableList, true)
@@ -2159,43 +2159,43 @@ export default {
       }
     },
     getVersion () {
-      fetch('https://api.vxetable.cn/demo/api/npm/versions/vxe-table').then(response => response.json()).then(({ sp, dp, ss, time, tags, versions }) => {
-        this.apiLoading = true
-        this.apiLoading = true
-        this.disabledPlugin = dp
-        this.showPlugin = sp
-        const stableVersionList = []
-        const betaVersionList = []
-        this.setSupportQQ(ss)
-        if (versions) {
-          versions.forEach(version => {
-            if (new RegExp(`^${this.version}.\\d{1,3}.\\d{1,3}$`).test(version)) {
-              stableVersionList.push({ label: version, value: version })
-            } else if (new RegExp(`^${this.version}.\\d{1,3}.\\d{1,3}-beta.\\d{1,3}$`).test(version)) {
-              betaVersionList.push({ label: version, value: version })
-            }
-          })
-        }
-        this.stableVersionList = stableVersionList
-        this.betaVersionList = betaVersionList
-        if (stableVersionList.length) {
-          this.selectStableVersion = tags && tags[`xtable-v${this.version}`] ? tags[`xtable-v${this.version}`] : stableVersionList[0].value
-        }
-        if (betaVersionList.length) {
-          this.selectBetaVersion = betaVersionList[0].value
-        }
+      // fetch('https://api.vxetable.cn/demo/api/npm/versions/vxe-table').then(response => response.json()).then(({ sp, dp, ss, time, tags, versions }) => {
+      //   this.apiLoading = true
+      //   this.apiLoading = true
+      //   this.disabledPlugin = dp
+      //   this.showPlugin = sp
+      //   const stableVersionList = []
+      //   const betaVersionList = []
+      //   this.setSupportQQ(ss)
+      //   if (versions) {
+      //     versions.forEach(version => {
+      //       if (new RegExp(`^${this.version}.\\d{1,3}.\\d{1,3}$`).test(version)) {
+      //         stableVersionList.push({ label: version, value: version })
+      //       } else if (new RegExp(`^${this.version}.\\d{1,3}.\\d{1,3}-beta.\\d{1,3}$`).test(version)) {
+      //         betaVersionList.push({ label: version, value: version })
+      //       }
+      //     })
+      //   }
+      //   this.stableVersionList = stableVersionList
+      //   this.betaVersionList = betaVersionList
+      //   if (stableVersionList.length) {
+      //     this.selectStableVersion = tags && tags[`xtable-v${this.version}`] ? tags[`xtable-v${this.version}`] : stableVersionList[0].value
+      //   }
+      //   if (betaVersionList.length) {
+      //     this.selectBetaVersion = betaVersionList[0].value
+      //   }
 
-        // 样式处理
-        const serveDate = XEUtils.toStringDate(time)
-        const yymmdd = XEUtils.toDateString(serveDate, 'yyyyMMdd')
-        if (['20210404', '20220405', '20230405', '20240404', '20250404'].includes(yymmdd)) {
-          localStorage.setItem('qingmingjie', '1')
-          document.body.className = `${document.body.className} qingmingjie`
-        } else {
-          localStorage.removeItem('qingmingjie')
-          document.body.className = document.body.className.replace('qingmingjie', '')
-        }
-      })
+      //   // 样式处理
+      //   const serveDate = XEUtils.toStringDate(time)
+      //   const yymmdd = XEUtils.toDateString(serveDate, 'yyyyMMdd')
+      //   if (['20210404', '20220405', '20230405', '20240404', '20250404'].includes(yymmdd)) {
+      //     localStorage.setItem('qingmingjie', '1')
+      //     document.body.className = `${document.body.className} qingmingjie`
+      //   } else {
+      //     localStorage.removeItem('qingmingjie')
+      //     document.body.className = document.body.className.replace('qingmingjie', '')
+      //   }
+      // })
 
       if (localStorage.getItem('qingmingjie')) {
         document.body.className = `${document.body.className} qingmingjie`

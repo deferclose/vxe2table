@@ -22,10 +22,12 @@
       :data="tableData"
       @resizable-change="resizableChangeEvent">
       <vxe-column type="seq" width="60"></vxe-column>
+      <vxe-column field="id" title="ID"></vxe-column>
       <vxe-column field="name" title="Name"></vxe-column>
       <vxe-column field="role" title="Role"></vxe-column>
       <vxe-column field="sex" title="Sex"></vxe-column>
       <vxe-column field="age" title="Age"></vxe-column>
+      <vxe-column field="address" title="Address"></vxe-column>
     </vxe-table>
 
     <p class="demo-code">{{ $t('app.body.button.showCode') }}</p>
